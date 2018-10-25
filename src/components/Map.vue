@@ -58,7 +58,9 @@ export default {
   methods: {
     initMap() {
       this.overlays.coolPlaces.layer = this.createLayerCoolPlaces();
-      this.map = L.map('map').setView([-41.29042, 174.78219], 13);
+      this.map = L.map('map', {
+        zoomControl: false,
+      }).setView([-41.29042, 174.78219], 13);
 
       this.map.addLayer(this.activeLayer);
       this.addActiveOverlays();
@@ -66,6 +68,10 @@ export default {
     },
 
     setBaseLayer(newLayer) {
+      if (this.map.hasLayer(this.baseLayers[newLayer].layer)) {
+        return;
+      }
+
       this.layerSelected = newLayer;
       this.clearBaseLayers();
       this.map.addLayer(this.activeLayer);
