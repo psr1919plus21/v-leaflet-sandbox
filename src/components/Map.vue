@@ -13,6 +13,7 @@
 <script>
 import L from 'leaflet';
 import MapControls from './MapControls';
+import { log } from 'util';
 
 export default {
   name: 'Map',
@@ -60,11 +61,16 @@ export default {
       this.overlays.coolPlaces.layer = this.createLayerCoolPlaces();
       this.map = L.map('map', {
         zoomControl: false,
-      }).setView([-41.29042, 174.78219], 13);
+        attributionControl: false,
+      }).setView([-41.29042, 174.78219], 12);
 
       this.map.addLayer(this.activeLayer);
       this.addActiveOverlays();
       this.bindMapEvents();
+
+      setTimeout(() => {
+        // console.log(this.map.layerPointToLatLng(this.map.getSize()));
+      }, 1000);
     },
 
     setBaseLayer(newLayer) {
@@ -103,12 +109,12 @@ export default {
 
     createLayerCoolPlaces() {
       const coolPlaces = new L.LayerGroup();
+      console.log('L.polyline ', L.polyline);
+      // L.polyline([[-41.28313, 174.77736], [-41.2895, 174.77803], [-41.29042, 174.78219], [-41.29437, 174.78405]]).addTo(coolPlaces);
       L.marker([-41.29042, 174.78219]).bindPopup('Te Papa').addTo(coolPlaces);
       L.marker([-41.29437, 174.78405]).bindPopup('Embassy Theatre').addTo(coolPlaces);
       L.marker([-41.2895, 174.77803]).bindPopup('Michael Fowler Centre').addTo(coolPlaces);
       L.marker([-41.28313, 174.77736]).bindPopup('Leuven Belgin Beer Cafe').addTo(coolPlaces);
-      L.polyline([[-41.28313, 174.77736], [-41.2895, 174.77803],
-        [-41.29042, 174.78219], [-41.29437, 174.78405]]).addTo(coolPlaces);
 
       return coolPlaces;
     },
@@ -118,7 +124,8 @@ export default {
     },
 
     mapClickHandler(e) {
-      console.log('map was clicked: ', e);
+      const sevast = L.latLng(44.5890022232585, 33.46695888787508);
+      console.log('from sevast: ', (this.map.distance(sevast, e.latlng) / 1000).toFixed(2));
     },
   },
 

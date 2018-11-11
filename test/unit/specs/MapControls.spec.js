@@ -9,12 +9,12 @@ beforeEach(() => {
       baseLayers: {
         openStreetMap: {
           key: 'openStreetMap',
-          name: 'OpenStreetMap'
+          name: 'OpenStreetMap',
         },
 
         openStreetMapGrey: {
           key: 'openStreetMapGrey',
-          name: 'OpenStreetMapGrey'
+          name: 'OpenStreetMapGrey',
         },
       },
 
@@ -22,10 +22,10 @@ beforeEach(() => {
         coolPlaces: {
           layer: null,
           isActive: false,
-          name: 'Cool Places'
-        }
+          name: 'Cool Places',
+        },
       },
-    }
+    },
   });
 });
 
@@ -83,8 +83,8 @@ describe('MapControls.vue', () => {
         coolPlaces: {
           layer: null,
           isActive: true,
-          name: 'Cool Places'
-        }
+          name: 'Cool Places',
+        },
       },
     });
 
@@ -92,5 +92,4 @@ describe('MapControls.vue', () => {
 
     expect(mapControlItems.at(2).text()).toBe('Hide Cool Places');
   });
-
 });
