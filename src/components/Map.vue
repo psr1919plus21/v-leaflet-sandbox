@@ -13,7 +13,6 @@
 <script>
 import L from 'leaflet';
 import MapControls from './MapControls';
-import { log } from 'util';
 
 export default {
   name: 'Map',
@@ -110,7 +109,8 @@ export default {
     createLayerCoolPlaces() {
       const coolPlaces = new L.LayerGroup();
       console.log('L.polyline ', L.polyline);
-      // L.polyline([[-41.28313, 174.77736], [-41.2895, 174.77803], [-41.29042, 174.78219], [-41.29437, 174.78405]]).addTo(coolPlaces);
+      // L.polyline([[-41.28313, 174.77736], [-41.2895, 174.77803],
+      // [-41.29042, 174.78219], [-41.29437, 174.78405]]).addTo(coolPlaces);
       L.marker([-41.29042, 174.78219]).bindPopup('Te Papa').addTo(coolPlaces);
       L.marker([-41.29437, 174.78405]).bindPopup('Embassy Theatre').addTo(coolPlaces);
       L.marker([-41.2895, 174.77803]).bindPopup('Michael Fowler Centre').addTo(coolPlaces);
