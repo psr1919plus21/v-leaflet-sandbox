@@ -42,7 +42,7 @@ export default {
         coolPlaces: {
           name: 'coolPlaces',
           layer: null,
-          isActive: false,
+          isActive: true,
         },
 
       },
@@ -65,11 +65,12 @@ export default {
 
       this.map.addLayer(this.activeLayer);
       this.addActiveOverlays();
-      this.bindMapEvents();
 
-      setTimeout(() => {
-        // console.log(this.map.layerPointToLatLng(this.map.getSize()));
-      }, 1000);
+      this.map.whenReady(() => {
+        this.bindMapEvents();
+      });
+
+      console.log(this.map.getZoomScale(2, 3));
     },
 
     setBaseLayer(newLayer) {
@@ -108,7 +109,6 @@ export default {
 
     createLayerCoolPlaces() {
       const coolPlaces = new L.LayerGroup();
-      console.log('L.polyline ', L.polyline);
       // L.polyline([[-41.28313, 174.77736], [-41.2895, 174.77803],
       // [-41.29042, 174.78219], [-41.29437, 174.78405]]).addTo(coolPlaces);
       L.marker([-41.29042, 174.78219]).bindPopup('Te Papa').addTo(coolPlaces);
@@ -139,6 +139,7 @@ export default {
 
 <style scoped>
   .map {
+    border: 1px solid #333;
     position: fixed;
     top: 0;
     bottom: 0;

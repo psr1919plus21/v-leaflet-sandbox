@@ -33,28 +33,45 @@ describe('Map.vue', () => {
     expect(vm.map.hasLayer(vm.baseLayers['openStreetMapGrey'].layer)).toBe(true);
   });
 
+  it('shouldn\'t clear layers if selected layer visible already', () => {
+    const { vm } = wrapper;
+    const clearBaseLayersSpy = jest.spyOn(vm, 'clearBaseLayers');
+    vm.setBaseLayer(vm.layerSelected);
+
+    expect(clearBaseLayersSpy).not.toBeCalled();
+  });
+
   it('should clear layers from the map', () => {
     const { vm } = wrapper;
-    let layersCount = 0;
 
     vm.clearBaseLayers();
-    // eslint-disable-next-line no-plusplus
-    vm.map.eachLayer(() => layersCount++);
-    expect(layersCount).toBe(0);
+
+    Object.values(vm.baseLayers).forEach((baseLayer) => {
+      expect(vm.map.hasLayer(baseLayer.layer)).toBe(false);
+    });
   });
 
-  it('should add overlay to the map', () => {
-    const { vm } = wrapper;
-
-    vm.overlayToggle('coolPlaces');
-    expect(vm.map.hasLayer(vm.overlays['coolPlaces'].layer)).toBe(true);
-  });
-
-  it('should remove overlay to the map by second call overlayToggle', () => {
+  it('should remove overlay from the map', () => {
     const { vm } = wrapper;
 
     expect(vm.map.hasLayer(vm.overlays['coolPlaces'].layer)).toBe(true);
+
     vm.overlayToggle('coolPlaces');
+
+    expect(vm.map.hasLayer(vm.overlays['coolPlaces'].layer)).toBe(false);
+  });
+
+  it('should add overlay to the map by second call overlayToggle', () => {
+    const { vm } = wrapper;
+
+    expect(vm.map.hasLayer(vm.overlays['coolPlaces'].layer)).toBe(false);
+
+    vm.overlayToggle('coolPlaces');
+
+    expect(vm.map.hasLayer(vm.overlays['coolPlaces'].layer)).toBe(true);
+
+    vm.overlayToggle('coolPlaces');
+
     expect(vm.map.hasLayer(vm.overlays['coolPlaces'].layer)).toBe(false);
   });
 });
