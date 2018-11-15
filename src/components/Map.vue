@@ -53,6 +53,8 @@ export default {
           isActive: false,
         },
       },
+
+      markers: [],
     };
   },
 
@@ -68,11 +70,12 @@ export default {
       this.map = L.map('map', {
         zoomControl: false,
         attributionControl: false,
-      }).setView([-41.29042, 174.78219], 12);
+      }).setView([50.5, 30.5], 15);
 
       this.map.createPane('toplevel').style.zIndex = 300;
       this.map.addLayer(this.activeLayer);
       this.addActiveOverlays();
+      this.addMarkers();
 
       this.map.whenReady(() => {
         this.bindMapEvents();
@@ -100,6 +103,27 @@ export default {
       activeOverlays.forEach((overlay) => {
         this.map.addLayer(overlay.layer);
       });
+    },
+
+    addMarkers() {
+      const myIcon = L.icon({
+        iconUrl: 'http://www.pngmart.com/files/1/Cat-PNG-File.png',
+        iconSize: [80, 80],
+        iconAnchor: [22, 94],
+        popupAnchor: [-3, -76],
+        shadowUrl: '',
+        shadowSize: [350, 350],
+        shadowAnchor: [22, 94],
+      });
+
+      const catMarket = L.marker([50.5, 30.5], { 
+        icon: myIcon,
+        draggable: true,
+        autoPan: true,
+      });
+
+      catMarket.addTo(this.map);
+      this.markers.push(catMarket);
     },
 
     overlayToggle(overlayName) {
