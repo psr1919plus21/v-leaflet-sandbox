@@ -47,7 +47,9 @@ export default {
 
         streetNames: {
           name: 'streetNames',
-          layer: L.tileLayer('http://services.arcgisonline.com/arcgis/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}'),
+          layer: L.tileLayer('http://services.arcgisonline.com/arcgis/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}', {
+            pane: 'toplevel',
+          }),
           isActive: false,
         },
       },
@@ -68,14 +70,13 @@ export default {
         attributionControl: false,
       }).setView([-41.29042, 174.78219], 12);
 
+      this.map.createPane('toplevel').style.zIndex = 300;
       this.map.addLayer(this.activeLayer);
       this.addActiveOverlays();
 
       this.map.whenReady(() => {
         this.bindMapEvents();
       });
-
-      console.log(this.map.getZoomScale(2, 3));
     },
 
     setBaseLayer(newLayer) {
