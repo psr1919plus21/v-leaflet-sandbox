@@ -45,6 +45,11 @@ export default {
           isActive: true,
         },
 
+        streetNames: {
+          name: 'streetNames',
+          layer: L.tileLayer('http://services.arcgisonline.com/arcgis/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}'),
+          isActive: false,
+        },
       },
     };
   },

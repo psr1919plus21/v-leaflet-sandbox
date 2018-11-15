@@ -13,7 +13,7 @@
       v-for="(overlay, index) in overlays"
       :key="index"
       v-text="(overlay.isActive ? 'Hide ' : 'Show ') + overlay.name"
-      @click="toggleOverlay('coolPlaces')"
+      @click="toggleOverlay(overlay.name)"
     ></div>
   </div>
 </template>

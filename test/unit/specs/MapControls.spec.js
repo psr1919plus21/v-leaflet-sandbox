@@ -24,6 +24,12 @@ beforeEach(() => {
           isActive: false,
           name: 'Cool Places',
         },
+
+        streetNames: {
+          layer: null,
+          isActive: false,
+          name: 'streetNames',
+        },
       },
     },
   });
@@ -37,7 +43,7 @@ describe('MapControls.vue', () => {
   it('should render map control items', () => {
     const mapControlsItems = wrapper.findAll('.map-controls__item');
 
-    expect(mapControlsItems.length).toBe(3);
+    expect(mapControlsItems.length).toBe(4);
   });
 
   it('should emit baseLayerChanged event with OpenStreetMap value by click', () => {
@@ -61,7 +67,7 @@ describe('MapControls.vue', () => {
 
     firstMapControlItem.trigger('click');
 
-    expect(wrapper.emitted().overlayToggle[0][0]).toBe('coolPlaces');
+    expect(wrapper.emitted().overlayToggle[0][0]).toBe('Cool Places');
   });
 
   it('should render base layers through props', () => {
@@ -91,5 +97,13 @@ describe('MapControls.vue', () => {
     const mapControlItems = wrapper.findAll('.map-controls__item');
 
     expect(mapControlItems.at(2).text()).toBe('Hide Cool Places');
+  });
+
+  it('should emit streetNames overlay toggle', () => {
+    const streetNamesControl = wrapper.findAll('.map-controls__item').at(3);
+
+    streetNamesControl.trigger('click');
+
+    expect(wrapper.emitted().overlayToggle[0][0]).toBe('streetNames');
   });
 });
