@@ -15,11 +15,20 @@
       v-text="(overlay.isActive ? 'Hide ' : 'Show ') + overlay.name"
       @click="toggleOverlay(overlay.name)"
     ></div>
+
+    <map-control-cats></map-control-cats>
+
+
   </div>
 </template>
 
 <script>
+import MapControlCats from './MapControlCats';
+
 export default {
+  components: {
+    MapControlCats,
+  },
 
   props: {
     baseLayers: {

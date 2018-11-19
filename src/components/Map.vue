@@ -53,8 +53,6 @@ export default {
           isActive: false,
         },
       },
-
-      markers: [],
     };
   },
 
@@ -75,10 +73,14 @@ export default {
       this.map.createPane('toplevel').style.zIndex = 300;
       this.map.addLayer(this.activeLayer);
       this.addActiveOverlays();
-      this.addMarkers();
 
       this.map.whenReady(() => {
         this.bindMapEvents();
+      });
+
+      this.$store.commit({
+        type: 'SET_MAP',
+        map: this.map,
       });
     },
 
@@ -103,27 +105,6 @@ export default {
       activeOverlays.forEach((overlay) => {
         this.map.addLayer(overlay.layer);
       });
-    },
-
-    addMarkers() {
-      const myIcon = L.icon({
-        iconUrl: 'http://www.pngmart.com/files/1/Cat-PNG-File.png',
-        iconSize: [80, 80],
-        iconAnchor: [22, 94],
-        popupAnchor: [-3, -76],
-        shadowUrl: '',
-        shadowSize: [350, 350],
-        shadowAnchor: [22, 94],
-      });
-
-      const catMarket = L.marker([50.5, 30.5], { 
-        icon: myIcon,
-        draggable: true,
-        autoPan: true,
-      });
-
-      catMarket.addTo(this.map);
-      this.markers.push(catMarket);
     },
 
     overlayToggle(overlayName) {
@@ -153,9 +134,9 @@ export default {
       this.map.addEventListener('click', this.mapClickHandler);
     },
 
-    mapClickHandler(e) {
-      const sevast = L.latLng(44.5890022232585, 33.46695888787508);
-      console.log('from sevast: ', (this.map.distance(sevast, e.latlng) / 1000).toFixed(2));
+    mapClickHandler() {
+      // const sevast = L.latLng(44.5890022232585, 33.46695888787508);
+      // console.log('from sevast: ', (this.map.distance(sevast, e.latlng) / 1000).toFixed(2));
     },
   },
 
