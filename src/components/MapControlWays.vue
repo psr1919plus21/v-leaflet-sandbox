@@ -30,7 +30,7 @@ export default {
 
   computed: {
     ...mapState({
-      map: 'map',
+      map: state => state.mapStore.map,
     }),
   },
 
@@ -42,7 +42,17 @@ export default {
     };
   },
 
+  watch: {
+    map() {
+      this.initPanes();
+    },
+  },
+
   methods: {
+    initPanes() {
+      this.map.createPane('lines').style.zIndex = 200;
+    },
+
     pointsLayerToggle() {
       if (this.isPointsLayerVisible) {
         this.map.removeLayer(this.pointsGroup);
@@ -89,11 +99,33 @@ export default {
     },
 
     createPoint(clickPosition) {
-      const wayPoint = L.marker(clickPosition, {
-        radius: 50,
+      const wayPoint = L.circleMarker(clickPosition, {
+        fillColor: '#f33',
+        fillOpacity: 0.9,
+        radius: 10,
+        draggable: true,
       });
 
+      wayPoint.addEventListener('click', this.setLinesBetweenPoints);
+
       return wayPoint;
+    },
+
+    setLinesBetweenPoints(e) {
+      this.setLinesBetweenPoints.points = this.setLinesBetweenPoints.points || [];
+      this.setLinesBetweenPoints.points.push(e.latlng);
+
+      if (this.setLinesBetweenPoints.points.length === 2) {
+        this.drawLineForPoints(this.setLinesBetweenPoints.points);
+        this.setLinesBetweenPoints.points = [];
+      }
+    },
+
+    drawLineForPoints(points) {
+      const line = L.polyline(points, {
+        pane: 'lines',
+      });
+      this.pointsGroup.addLayer(line);
     },
   },
 };

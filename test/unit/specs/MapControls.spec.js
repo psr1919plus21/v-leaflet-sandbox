@@ -1,10 +1,20 @@
-import { mount } from '@vue/test-utils';
+import { mount, createLocalVue } from '@vue/test-utils';
+import Vuex from 'vuex';
+
 import MapControls from '@/components/MapControls';
+import storeInit from '../../../src/store';
+
+const localVue = createLocalVue();
+localVue.use(Vuex);
+
+const store = new Vuex.Store(storeInit);
 
 let wrapper;
 
 beforeEach(() => {
   wrapper = mount(MapControls, {
+    localVue,
+    store,
     propsData: {
       baseLayers: {
         openStreetMap: {
@@ -43,7 +53,7 @@ describe('MapControls.vue', () => {
   it('should render map control items', () => {
     const mapControlsItems = wrapper.findAll('.map-controls__item');
 
-    expect(mapControlsItems.length).toBe(4);
+    expect(mapControlsItems.length).toBe(6);
   });
 
   it('should emit baseLayerChanged event with OpenStreetMap value by click', () => {

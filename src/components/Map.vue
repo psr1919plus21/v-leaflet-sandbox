@@ -11,14 +11,17 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex';
 import L from 'leaflet';
 import MapControls from './MapControls';
 
 export default {
   name: 'Map',
+
   components: {
     MapControls,
   },
+
   data() {
     return {
       map: null,
@@ -63,6 +66,10 @@ export default {
   },
 
   methods: {
+    ...mapMutations({
+      SET_MAP: 'mapStore/SET_MAP',
+    }),
+
     initMap() {
       this.overlays.coolPlaces.layer = this.createLayerCoolPlaces();
       this.map = L.map('map', {
@@ -78,8 +85,7 @@ export default {
         this.bindMapEvents();
       });
 
-      this.$store.commit({
-        type: 'SET_MAP',
+      this.SET_MAP({
         map: this.map,
       });
     },

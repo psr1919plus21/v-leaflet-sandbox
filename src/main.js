@@ -5,6 +5,7 @@ import Vuex from 'vuex';
 
 import App from './App';
 import router from './router';
+
 import storeInit from './store';
 
 Vue.use(Vuex);

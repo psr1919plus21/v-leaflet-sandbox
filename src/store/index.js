@@ -1,11 +1,7 @@
-export default {
-  state: {
-    map: null,
-  },
+import mapStore from './modules/mapStore';
 
-  mutations: {
-    SET_MAP(state, payload) {
-      state.map = payload.map;
-    },
+export default {
+  modules: {
+    mapStore,
   },
 };

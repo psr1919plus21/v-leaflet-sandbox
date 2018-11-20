@@ -1,8 +1,19 @@
 /* eslint-disable dot-notation */
-import { mount } from '@vue/test-utils';
+import { mount, createLocalVue } from '@vue/test-utils';
+import Vuex from 'vuex';
+
 import Map from '@/components/Map';
 
+import storeInit from '../../../src/store';
+
+const localVue = createLocalVue();
+localVue.use(Vuex);
+
+const store = new Vuex.Store(storeInit);
+
 const wrapper = mount(Map, {
+  localVue,
+  store,
   attachToDocument: true,
 });
 
