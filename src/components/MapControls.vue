@@ -17,6 +17,7 @@
     ></div>
 
     <map-control-cats></map-control-cats>
+    <map-control-ways map-ways-class="map-controls__item"></map-control-ways>
 
 
   </div>
@@ -24,10 +25,12 @@
 
 <script>
 import MapControlCats from './MapControlCats';
+import MapControlWays from './MapControlWays';
 
 export default {
   components: {
     MapControlCats,
+    MapControlWays,
   },
 
   props: {
