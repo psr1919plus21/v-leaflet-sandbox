@@ -100,7 +100,8 @@ export default {
 
     createPoint(clickPosition) {
       const wayPoint = L.circleMarker(clickPosition, {
-        fillColor: '#f33',
+        color: '#444',
+        fillColor: '#f7ff05',
         fillOpacity: 0.9,
         radius: 10,
         draggable: true,
@@ -113,24 +114,51 @@ export default {
 
     setLinesBetweenPoints(e) {
       this.setLinesBetweenPoints.points = this.setLinesBetweenPoints.points || [];
-      this.setLinesBetweenPoints.points.push(e.latlng);
+      this.setLinesBetweenPoints.points.push(e);
+
+      const currentMarker = e.sourceTarget;
+      currentMarker.setStyle({ color: '#922' });
 
       if (this.setLinesBetweenPoints.points.length === 2) {
         this.drawLineForPoints(this.setLinesBetweenPoints.points);
+        this.setLinesBetweenPoints.points.forEach(point => point.sourceTarget.setStyle({ color: '#444' }));
         this.setLinesBetweenPoints.points = [];
       }
     },
 
+    addDistance(points, lineCenter) {
+      const pointsLatLng = points.map(point => point.latlng);
+      const distance = (this.map.distance(pointsLatLng[0], pointsLatLng[1]) / 1000).toFixed(2);
+
+      const myIcon = L.divIcon({ html: `${distance} km`, className: 'map-ways__distance-label' });
+      this.pointsGroup.addLayer(L.marker(lineCenter, { icon: myIcon }));
+    },
+
     drawLineForPoints(points) {
-      const line = L.polyline(points, {
+      const pointsLatLng = points.map(point => point.latlng);
+      const line = L.polyline(pointsLatLng, {
         pane: 'lines',
       });
       this.pointsGroup.addLayer(line);
+
+      const lineCenter = line.getBounds().getCenter();
+      this.addDistance(points, lineCenter);
     },
   },
 };
 </script>
 
 <style>
+.map-ways__distance-label {
+    font-size: 11px;
+    width: auto !important;
+    height: auto !important;
+    white-space: nowrap;
+    background: #fff;
+    font-weight: bold;
+    color: #444;
+    padding: 2px;
+    border: 1px solid #333;
+}
 
 </style>

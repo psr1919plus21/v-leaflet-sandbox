@@ -19,7 +19,7 @@ const wrapper = mount(Map, {
 
 describe('Map.vue', () => {
   it('should render map container', () => {
-    expect(wrapper.find('.map')).toBeDefined();
+    expect(wrapper.find('.map').element).toBeDefined();
   });
 
   it('should create a leaflet instance', (done) => {
