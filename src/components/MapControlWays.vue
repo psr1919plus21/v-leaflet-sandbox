@@ -39,6 +39,7 @@ export default {
       isProgress: false,
       isPointsLayerVisible: false,
       pointsGroup: L.layerGroup(),
+      points: [],
     };
   },
 
@@ -85,9 +86,22 @@ export default {
         this.pointsGroup.addTo(this.map);
         this.isPointsLayerVisible = true;
       }
-      const wayPoint = this.createPoint(e.latlng);
+      const wayPoint = {
+        point: this.createPoint(e.latlng),
+        weight: Infinity,
+        prevPoint: null,
+        arcs: [],
+      };
 
-      this.pointsGroup.addLayer(wayPoint);
+      this.points.push(wayPoint);
+
+      wayPoint.point.bindTooltip(`weight: ${wayPoint.weight}<br>prevPoint: ${wayPoint.prevPoint}`, {
+        permanent: true,
+        direction: 'top',
+        offset: [0, -10],
+      });
+
+      this.pointsGroup.addLayer(wayPoint.point);
 
       if (e.originalEvent.shiftKey) {
         return;
@@ -100,6 +114,7 @@ export default {
 
     createPoint(clickPosition) {
       const wayPoint = L.circleMarker(clickPosition, {
+        className: 'map-ways__point',
         color: '#444',
         fillColor: '#f7ff05',
         fillOpacity: 0.9,
@@ -120,18 +135,40 @@ export default {
       currentMarker.setStyle({ color: '#922' });
 
       if (this.setLinesBetweenPoints.points.length === 2) {
-        this.drawLineForPoints(this.setLinesBetweenPoints.points);
+        const line = this.drawLineForPoints(this.setLinesBetweenPoints.points);
+        const distance = this.addDistance(this.setLinesBetweenPoints.points, line);
         this.setLinesBetweenPoints.points.forEach(point => point.sourceTarget.setStyle({ color: '#444' }));
+        this.linkPoints(this.setLinesBetweenPoints.points, line, distance);
         this.setLinesBetweenPoints.points = [];
       }
     },
 
-    addDistance(points, lineCenter) {
+    linkPoints(points, line, distance) {
+      const firstPoint = this.points.find(({ point }) => point === points[0].sourceTarget);
+      const secondPoint = this.points.find(({ point }) => point === points[1].sourceTarget);
+
+      firstPoint.arcs.push({
+        line,
+        distance,
+        point: secondPoint.point,
+      });
+
+      secondPoint.arcs.push({
+        line,
+        distance,
+        point: firstPoint.point,
+      });
+    },
+
+
+    addDistance(points, line) {
+      const lineCenter = line.getBounds().getCenter();
       const pointsLatLng = points.map(point => point.latlng);
       const distance = (this.map.distance(pointsLatLng[0], pointsLatLng[1]) / 1000).toFixed(2);
 
       const myIcon = L.divIcon({ html: `${distance} km`, className: 'map-ways__distance-label' });
       this.pointsGroup.addLayer(L.marker(lineCenter, { icon: myIcon }));
+      return distance;
     },
 
     drawLineForPoints(points) {
@@ -140,9 +177,7 @@ export default {
         pane: 'lines',
       });
       this.pointsGroup.addLayer(line);
-
-      const lineCenter = line.getBounds().getCenter();
-      this.addDistance(points, lineCenter);
+      return line;
     },
   },
 };
@@ -159,6 +194,10 @@ export default {
     color: #444;
     padding: 2px;
     border: 1px solid #333;
+}
+
+.map-ways__point:hover {
+  fill-opacity: .7;
 }
 
 </style>
