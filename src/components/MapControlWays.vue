@@ -13,6 +13,18 @@
         @click="pointsLayerToggle" >
           {{isPointsLayerVisible ? 'Hide' : 'Show'}}
       </div>
+
+      <div
+        class="map-ways__control"
+        @click="waitForStartPoint">
+          {{ isStartPointProgress ? 'Click to start point' : 'Set start point' }}
+      </div>
+
+      <div
+        class="map-ways__control"
+        @click="setFinishPoint">
+          Set finish point
+      </div>
     </div>
   </div>
 </template>
@@ -37,6 +49,7 @@ export default {
   data() {
     return {
       isProgress: false,
+      isStartPointProgress: false,
       isPointsLayerVisible: false,
       pointsGroup: L.layerGroup(),
       points: [],
@@ -87,15 +100,18 @@ export default {
         this.isPointsLayerVisible = true;
       }
       const wayPoint = {
+        id: this.points.length,
         point: this.createPoint(e.latlng),
         weight: Infinity,
         prevPoint: null,
         arcs: [],
+        isStart: false,
+        ifFinish: false,
       };
 
       this.points.push(wayPoint);
 
-      wayPoint.point.bindTooltip(`weight: ${wayPoint.weight}<br>prevPoint: ${wayPoint.prevPoint}`, {
+      wayPoint.point.bindTooltip(`point: ${wayPoint.id}<br>weight: ${wayPoint.weight}<br>prevPoint: ${wayPoint.prevPoint}`, {
         permanent: true,
         direction: 'top',
         offset: [0, -10],
@@ -110,6 +126,15 @@ export default {
       this.isProgress = false;
       this.map.removeEventListener('click', this.addPointToMap);
       this.setCursorDefault();
+    },
+
+    updatePointLabel(wayPoint) {
+      wayPoint.point.unbindTooltip();
+      wayPoint.point.bindTooltip(`point: ${wayPoint.id}<br>weight: ${wayPoint.weight}<br>prevPoint: ${wayPoint.prevPoint}`, {
+        permanent: true,
+        direction: 'top',
+        offset: [0, -10],
+      });
     },
 
     createPoint(clickPosition) {
@@ -128,6 +153,11 @@ export default {
     },
 
     setLinesBetweenPoints(e) {
+      if (this.isStartPointProgress) {
+        this.setStartPoint(e.sourceTarget);
+        return;
+      }
+
       this.setLinesBetweenPoints.points = this.setLinesBetweenPoints.points || [];
       this.setLinesBetweenPoints.points.push(e);
 
@@ -178,6 +208,36 @@ export default {
       });
       this.pointsGroup.addLayer(line);
       return line;
+    },
+
+    waitForStartPoint() {
+      this.isStartPointProgress = true;
+    },
+
+    clearOldStartPoint() {
+      const oldStartPoint = this.points.find(wayPoint => wayPoint.isStart);
+
+      if (!oldStartPoint) {
+        return;
+      }
+
+      oldStartPoint.isStart = false;
+      oldStartPoint.weight = Infinity;
+      this.updatePointLabel(oldStartPoint);
+    },
+
+    setStartPoint(pointForStart) {
+      this.clearOldStartPoint();
+      const startPoint = this.points.find(({ point }) => point === pointForStart);
+      startPoint.isStart = true;
+      startPoint.weight = 0;
+      startPoint.point.setStyle({ color: '#393' });
+      this.updatePointLabel(startPoint);
+      this.isStartPointProgress = false;
+    },
+
+    setFinishPoint() {
+      console.log('finish');
     },
   },
 };
