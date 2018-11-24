@@ -75,7 +75,7 @@ export default {
       this.map = L.map('map', {
         zoomControl: false,
         attributionControl: false,
-      }).setView([50.5, 30.5], 15);
+      }).setView([44.58, 33.46], 15);
 
       this.map.createPane('toplevel').style.zIndex = 300;
       this.map.addLayer(this.activeLayer);

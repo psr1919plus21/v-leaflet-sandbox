@@ -291,13 +291,11 @@ export default {
       pointsClone.sort((a, b) => a.weight - b.weight);
 
       const currentPoint = pointsClone.shift();
-      if (!currentPoint) {
-        console.log('end: cant reach end point');
-        return;
-      }
+
 
       if (currentPoint.isFinish) {
         console.log('end: find way');
+        this.highlightShortestWay(currentPoint);
         return;
       }
 
@@ -311,6 +309,16 @@ export default {
       });
 
       this.findShortestWay(pointsClone);
+    },
+
+    highlightShortestWay(wayPoint) {
+      if (!wayPoint.prevPoint) {
+        return;
+      }
+
+      const prevArc = wayPoint.arcs.find(arc => arc.point.point === wayPoint.prevPoint.point);
+      prevArc.line.setStyle({ color: '#922' });
+      this.highlightShortestWay(wayPoint.prevPoint);
     },
   },
 };
