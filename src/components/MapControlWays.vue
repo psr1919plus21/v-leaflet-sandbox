@@ -22,14 +22,21 @@
 
       <div
         class="map-ways__control"
-        @click="setFinishPoint">
+        @click="waitForFinishPoint">
           Set finish point
+      </div>
+
+      <div
+        class="map-ways__control"
+        @click="calculateShortestWay">
+          Find shortest way
       </div>
     </div>
   </div>
 </template>
 
 <script>
+/* eslint-disable no-param-reassign */
 import L from 'leaflet';
 import { mapState } from 'vuex';
 
@@ -50,6 +57,7 @@ export default {
     return {
       isProgress: false,
       isStartPointProgress: false,
+      isFinishPointProgress: false,
       isPointsLayerVisible: false,
       pointsGroup: L.layerGroup(),
       points: [],
@@ -106,7 +114,7 @@ export default {
         prevPoint: null,
         arcs: [],
         isStart: false,
-        ifFinish: false,
+        isFinish: false,
       };
 
       this.points.push(wayPoint);
@@ -129,8 +137,9 @@ export default {
     },
 
     updatePointLabel(wayPoint) {
+      const prevPoint = wayPoint.prevPoint && wayPoint.prevPoint.id;
       wayPoint.point.unbindTooltip();
-      wayPoint.point.bindTooltip(`point: ${wayPoint.id}<br>weight: ${wayPoint.weight}<br>prevPoint: ${wayPoint.prevPoint}`, {
+      wayPoint.point.bindTooltip(`point: ${wayPoint.id}<br>weight: ${wayPoint.weight}<br>prevPoint: ${prevPoint}`, {
         permanent: true,
         direction: 'top',
         offset: [0, -10],
@@ -152,9 +161,15 @@ export default {
       return wayPoint;
     },
 
+    // TODO: split handlers
     setLinesBetweenPoints(e) {
       if (this.isStartPointProgress) {
         this.setStartPoint(e.sourceTarget);
+        return;
+      }
+
+      if (this.isFinishPointProgress) {
+        this.setFinishPoint(e.sourceTarget);
         return;
       }
 
@@ -180,16 +195,15 @@ export default {
       firstPoint.arcs.push({
         line,
         distance,
-        point: secondPoint.point,
+        point: secondPoint,
       });
 
       secondPoint.arcs.push({
         line,
         distance,
-        point: firstPoint.point,
+        point: firstPoint,
       });
     },
-
 
     addDistance(points, line) {
       const lineCenter = line.getBounds().getCenter();
@@ -210,10 +224,6 @@ export default {
       return line;
     },
 
-    waitForStartPoint() {
-      this.isStartPointProgress = true;
-    },
-
     clearOldStartPoint() {
       const oldStartPoint = this.points.find(wayPoint => wayPoint.isStart);
 
@@ -221,9 +231,29 @@ export default {
         return;
       }
 
+      oldStartPoint.point.setStyle({ color: '#444' });
       oldStartPoint.isStart = false;
       oldStartPoint.weight = Infinity;
       this.updatePointLabel(oldStartPoint);
+    },
+
+    clearOldFinishPoint() {
+      const oldFinishPoint = this.points.find(wayPoint => wayPoint.isFinish);
+
+      if (!oldFinishPoint) {
+        return;
+      }
+
+      oldFinishPoint.point.setStyle({ color: '#444' });
+      oldFinishPoint.isFinish = false;
+    },
+
+    waitForStartPoint() {
+      this.isStartPointProgress = true;
+    },
+
+    waitForFinishPoint() {
+      this.isFinishPointProgress = true;
     },
 
     setStartPoint(pointForStart) {
@@ -236,8 +266,51 @@ export default {
       this.isStartPointProgress = false;
     },
 
-    setFinishPoint() {
-      console.log('finish');
+    setFinishPoint(pointForFinish) {
+      this.clearOldFinishPoint();
+      const finishPoint = this.points.find(({ point }) => point === pointForFinish);
+      finishPoint.isFinish = true;
+      finishPoint.point.setStyle({ color: '#f33' });
+      this.isFinishPointProgress = false;
+    },
+
+    calculateShortestWay() {
+      const startPoint = this.points.find(wayPoint => wayPoint.isStart);
+      const finishPoint = this.points.find(wayPoint => wayPoint.isFinish);
+
+      if (!startPoint || !finishPoint) {
+        console.warn(`Start and finish points both required.\nstartPoint: ${startPoint}\nfinishPoint: ${finishPoint}`);
+        return;
+      }
+
+      const pointsClone = this.points.slice();
+      this.findShortestWay(pointsClone);
+    },
+
+    findShortestWay(pointsClone) {
+      pointsClone.sort((a, b) => a.weight - b.weight);
+
+      const currentPoint = pointsClone.shift();
+      if (!currentPoint) {
+        console.log('end: cant reach end point');
+        return;
+      }
+
+      if (currentPoint.isFinish) {
+        console.log('end: find way');
+        return;
+      }
+
+      currentPoint.arcs.forEach((arc) => {
+        const wayToNextPoint = parseFloat(currentPoint.weight) + parseFloat(arc.distance);
+        if (arc.point.weight > wayToNextPoint) {
+          arc.point.weight = wayToNextPoint;
+          arc.point.prevPoint = currentPoint;
+          this.updatePointLabel(arc.point);
+        }
+      });
+
+      this.findShortestWay(pointsClone);
     },
   },
 };
